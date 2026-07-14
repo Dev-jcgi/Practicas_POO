@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 2 - Diagramas de Clases UML</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script defer src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-deep: #060a16;
+            --bg-mid: #0f172a;
+            --accent-a: #34d399;
+            --accent-b: #38bdf8;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 8% 12%, rgba(52, 211, 153, 0.14), transparent 35%),
+                radial-gradient(circle at 88% 8%, rgba(56, 189, 248, 0.13), transparent 30%),
+                linear-gradient(150deg, var(--bg-deep), var(--bg-mid) 50%, #111827);
+            color: #cbd5e1;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .orb {
+            position: fixed;
+            width: 16rem;
+            height: 16rem;
+            border-radius: 9999px;
+            filter: blur(55px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.42;
+        }
+
+        .orb-a {
+            top: 5rem;
+            left: -3rem;
+            background: var(--accent-a);
+        }
+
+        .orb-b {
+            bottom: 3rem;
+            right: -2rem;
+            background: var(--accent-b);
+        }
+
+        nav, main, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .magnetic-card {
+            backdrop-filter: blur(7px);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.38);
+        }
+
+        ol { counter-reset: item; }
+        ol > li { counter-increment: item; position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        ol > li::before { content: counter(item) "."; position: absolute; left: 0; color: #3b82f6; font-weight: 600; }
+
+        ul > li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        ul > li::before { content: "•"; position: absolute; left: 0.5rem; color: #3b82f6; font-weight: bold; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500/30 selection:text-blue-200">
+
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+
+    <nav class="sticky top-0 z-50 w-full backdrop-blur-lg bg-slate-900/80 border-b border-slate-800 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    </div>
+                    <span class="text-white font-bold text-lg tracking-tight">POO<span class="text-emerald-400">.UML</span></span>
+                </div>
+                <a href="index.html" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Volver al indice</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header class="text-center mb-16 reveal active">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+                Practica 2
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">Diagramas de Clases UML</span>
+            </h1>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                Modelado de clases, relaciones y decisiones de diseno para representar soluciones orientadas a objetos.
+            </p>
+        </header>
+
+        <section class="mb-20">
+            <article class="reveal bg-gradient-to-r from-slate-800 to-slate-800/50 rounded-2xl p-6 border border-slate-700 mb-8 flex flex-col sm:flex-row items-center gap-6">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0 border border-purple-500/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-1"><span class="text-purple-400 mr-2">1)</span> Mapa Mental</h3>
+                    <p class="text-slate-300">Desarrolle un mapa mental comparando programacion estructurada y POO. Incluya modularidad, reutilizacion, mantenimiento, pruebas y escalabilidad.</p>
+                </div>
+            </article>
+
+            <div class="reveal flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-6">
+                <svg class="w-6 h-6 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="text-emerald-300 font-medium text-sm sm:text-base"><strong>2)</strong> Elabore diagramas UML (atributos, metodos, visibilidad y relaciones). En cada caso agregue una nota con supuestos de diseno.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">A) Circunferencia</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Atributo radio.</li>
+                        <li>Metodos para area y perimetro.</li>
+                        <li>Propiedades para modificar y consultar radio.</li>
+                    </ul>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">B) Rectangulo</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Datos: Largo, Ancho.</li>
+                        <li>Metodos: CalcularArea(), CalcularPerimetro().</li>
+                    </ul>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">C) Conversor Temp</h3>
+                    <p class="text-sm text-slate-300">Disene clase para convertir temperatura F a C.</p>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">D) Tipos de Objetos</h3>
+                    <ol class="text-sm text-slate-300">
+                        <li>Navegador de internet.</li>
+                        <li>Factura de ventas.</li>
+                        <li>Computadora.</li>
+                    </ol>
+                    <p class="text-xs text-slate-400">Para cada uno: minimo 3 atributos y 3 acciones.</p>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700 lg:col-span-2">
+                    <h3 class="text-white font-bold mb-3">E) Taller Mecanico (Modelado Complejo)</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
+                        Modelar orden de trabajo con id unico, datos de cliente (nombre, direccion, telefono) y datos del auto (marca, modelo, color, placas), mostrando relaciones entre clases.
+                    </p>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">F) Clase Fecha</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Datos: Dia, Mes, Ano.</li>
+                        <li>Constructores: por sistema o parametros.</li>
+                        <li>Metodos: modificar, mostrar formato y validar fecha.</li>
+                    </ul>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">G) Supermercado</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Clave, Descripcion, Precio, Stock.</li>
+                        <li>Constructor con parametros.</li>
+                        <li>Metodo para modificar 4 atributos y propiedades individuales.</li>
+                    </ul>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">H) Cuenta Bancaria</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Atributo: Monto.</li>
+                        <li>Operaciones: Depositar, Girar, Obtener Saldo.</li>
+                    </ul>
+                </div>
+
+                <div class="reveal bg-slate-800/40 rounded-xl p-5 border border-slate-700">
+                    <h3 class="text-white font-bold mb-3">I) Aerolinea</h3>
+                    <ul class="text-sm text-slate-300">
+                        <li>Numero, Fecha, Hora despegue, Duracion.</li>
+                        <li>Operaciones: demora y fecha/hora de aterrizaje.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="reveal mt-8 bg-slate-900/60 border border-slate-700 rounded-xl p-5">
+                <h3 class="text-white font-semibold mb-3">Rubrica Sugerida para UML</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-slate-800/70 rounded-lg p-3 border border-slate-700">
+                        <p class="text-slate-300 font-medium">Correccion Tecnica (35%)</p>
+                        <p class="text-slate-400 mt-1">Atributos, metodos, visibilidad y firmas coherentes.</p>
+                    </div>
+                    <div class="bg-slate-800/70 rounded-lg p-3 border border-slate-700">
+                        <p class="text-slate-300 font-medium">Modelado (30%)</p>
+                        <p class="text-slate-400 mt-1">Relaciones correctas: asociacion, composicion, agregacion.</p>
+                    </div>
+                    <div class="bg-slate-800/70 rounded-lg p-3 border border-slate-700">
+                        <p class="text-slate-300 font-medium">Claridad (20%)</p>
+                        <p class="text-slate-400 mt-1">Diagrama legible y nombres significativos.</p>
+                    </div>
+                    <div class="bg-slate-800/70 rounded-lg p-3 border border-slate-700">
+                        <p class="text-slate-300 font-medium">Justificacion (15%)</p>
+                        <p class="text-slate-400 mt-1">Explicacion breve de decisiones de diseno.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-900 py-8 text-center text-slate-500 text-sm mt-12">
+        <div class="max-w-5xl mx-auto px-4">
+            <p>Practica 2 para Programacion Orientada a Objetos y modelado UML.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                root: null,
+                rootMargin: '0px 0px -50px 0px',
+                threshold: 0.1
+            };
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            const cards = document.querySelectorAll('main article, main section > div, main .rounded-xl, main .rounded-2xl');
+            cards.forEach((card, index) => {
+                card.classList.add('magnetic-card');
+                card.setAttribute('data-aos', 'fade-up');
+                card.setAttribute('data-aos-delay', String((index % 8) * 55));
+            });
+
+            if (window.AOS) {
+                AOS.init({
+                    duration: 900,
+                    easing: 'ease-out-cubic',
+                    once: true,
+                    offset: 30
+                });
+            }
+
+            if (window.VanillaTilt) {
+                VanillaTilt.init(document.querySelectorAll('.magnetic-card'), {
+                    max: 4,
+                    speed: 360,
+                    glare: true,
+                    'max-glare': 0.12,
+                    scale: 1.01
+                });
+            }
+
+            if (window.gsap) {
+                gsap.from('header h1, header p', {
+                    y: 24,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.12,
+                    ease: 'power3.out'
+                });
+
+                gsap.to('.orb-a', {
+                    x: 28,
+                    y: -18,
+                    duration: 8,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+
+                gsap.to('.orb-b', {
+                    x: -24,
+                    y: 14,
+                    duration: 9,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            }
+        });
+    </script>
+</body>
+</html>
